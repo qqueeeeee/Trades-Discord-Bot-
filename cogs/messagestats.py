@@ -95,11 +95,18 @@ class MessageStats(commands.GroupCog, name="message_stats"):
         name="get_graph",
         description="Get a graph of messages in channels"
     )
+    @app_commands.describe(time="Time to choose from ")
+    @app_commands.choices(time=[
+        discord.app_commands.Choice(name="1 Day", value="1 day"),
+        discord.app_commands.Choice(name="7 Days", value="7 days"),
+    ])
     @is_owner()
-    async def get_graph(self, interaction: discord.Interaction, channel: discord.TextChannel):
-        channel = interaction.channel
+    async def get_graph(self, interaction: discord.Interaction, channel: discord.TextChannel, time: discord.app_commands.Choice[str]):
+        if channel == None:
+            channel = interaction.channel
         await interaction.response.defer()
-        plot_graph(author_data=get_author_data(guildname=interaction.guild.name, guildid = interaction.guild.id), channel_data=get_channel_stats(guildname=interaction.guild.name, guildid= interaction.guild.id, channelid=channel.id))
+        print(f"plot_graph(guildname={interaction.guild.name}, guildid= {interaction.guild.id}, channelid={channel.id}, time={time})")
+        plot_graph(guildname=interaction.guild.name, guildid= interaction.guild.id, channelid=channel.id, time=time)
         filename =  "test.png"
         plt.savefig(filename)
         image = discord.File(filename)
